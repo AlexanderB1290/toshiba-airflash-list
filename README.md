@@ -5,7 +5,7 @@ A minimalistic and snappy web interface list for Toshiba Air Flash Wi-Fi SD card
 - Upload of any types of files
 - Delete a file
 
-![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
+![alt text](https://github.com/AlexanderB1290/toshiba-airflash-list/blob/master/air-flash-upload-simple.png "Simple UI")
 
 
 # Used libraries
