@@ -20,4 +20,5 @@ All used libraries are provided. Only the min versions are used.
 2. Enable visibility of hidden files
 3. Navigate to directory **SD_WLAN**
 4. Copy all content of this repo (except LICENSE and picture in root) to this directory
-5. Enjoy!
+5. Change the hostname or provide an IP address in **main.js**
+6. Enjoy!
