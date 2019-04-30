@@ -24,10 +24,10 @@ var fileDelete = function (path) {
 var uploadFileList = function (fileList) {
     $('#pleaseWaitDialog').modal();
     var formData = new FormData();
-    for (var i in fileList) {
+    for (var i = 0; i < fileList.length; i++) {
         var fl = fileList.item(i);
         console.dir(fl);
-        formData.append("file" + i, fl, fl.name);
+        formData.append(fl.name, fl, fl.name);
     }
     console.dir(formData);
     $.ajax({
@@ -35,7 +35,7 @@ var uploadFileList = function (fileList) {
         type: "POST",
         data: formData,
         processData: false,
-        contentType: false,
+        contentType: "multipart/form-data",
         success: function (result) {
             $('#pleaseWaitDialog').modal('hide');
             window.location.reload();
