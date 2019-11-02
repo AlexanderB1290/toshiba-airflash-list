@@ -1,7 +1,7 @@
 /**
  * Hostname or IP address of AirFlash SD card
  */
-var host = "prusa.flashair";
+var host = window.location.host;
 
 //Upload interface
 var uploadUrl = "http://" + host + "/upload.cgi";
