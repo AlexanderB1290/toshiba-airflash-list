@@ -26,7 +26,6 @@ var uploadFileList = function (fileList) {
     var formData = new FormData();
     for (var i = 0; i < fileList.length; i++) {
         var fl = fileList.item(i);
-        console.dir(fl);
         formData.append(fl.name, fl, fl.name);
     }
     console.dir(formData);
@@ -35,7 +34,7 @@ var uploadFileList = function (fileList) {
         type: "POST",
         data: formData,
         processData: false,
-        contentType: "multipart/form-data",
+        contentType: false,
         success: function (result) {
             $('#pleaseWaitDialog').modal('hide');
             window.location.reload();
@@ -119,13 +118,13 @@ function showFileList(path) {
         var fileobj = $("<div></div>");
         //Make a button for deletion
         var delBtn = $('<button type="button" class="close text-danger" aria-label="Delete"><span aria-hidden="true">&times;</span></button>').attr('onclick', "deleteFile('" + urnFl + "')");
+		fileobj.append(delBtn);
         // Append a file entry or directory to the end of the list.
         $("#list").append(
             fileobj.append(
                 filelink.append(
                     caption
-                ),
-                delBtn
+                )             
             )
         );
     });
