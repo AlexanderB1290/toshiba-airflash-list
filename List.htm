@@ -3,7 +3,7 @@
 <head>
     <title>FlashAir</title>
     <meta charset="UTF-8">
-	<link rel="icon" href="/SD_WLAN/icons/icon.png">
+    <link rel="icon" href="/SD_WLAN/icons/icon.png">
     <link rel="stylesheet" href="/SD_WLAN/css/bootstrap.min.css">
     <script type="text/javascript" src="/SD_WLAN/js/lib/jquery-3.4.0.min.js"></script>
     <script type="text/javascript" src="/SD_WLAN/js/lib/bootstrap.min.js"></script>
@@ -22,7 +22,13 @@
     </div>
 </div>
 <div id="header" class="row">
-    <div class="col-10"><h1 class="mt-1">Prusa i3 MK3S SD card</h1></div>
+    <div class="col-8"><h1 class="mt-1">Prusa i3 MK3S SD card</h1></div>
+    <div class="col-2 mt-3">
+        <div id="freeSpace" style="font-size: 11px;"></div>
+        <div id="spaceSize" class="progress">
+            <div id="spaceFull" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+    </div>
     <div class="col">
         <input id="btn-upload" class="btn btn-primary mt-3" type="button" value="Upload" onclick="triggerUpload()"/>
         <input id="file-upload" type="file" name="name" style="display: none;" accept=".gcode" onchange="uploadFile()"/>

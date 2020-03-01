@@ -3,29 +3,46 @@
  */
 var host = window.location.host;
 
+
+var URL = {
+    BASE: "http://" + host
+};
+URL["UPLOAD"] = URL.BASE + "/upload.cgi";
+URL["COMMAND"] = URL.BASE + "/command.cgi";
+
+function setBusy() {
+    // Shows spinner in top left, for operations that should not take long
+    $("#pleaseWaitDialog").modal();
+}
+
+function clearBusy() {
+    $("#pleaseWaitDialog").modal('hide');
+}
+
+
 //Upload interface
-var uploadUrl = "http://" + host + "/upload.cgi";
 var fileDelete = function (path) {
-    $('#pleaseWaitDialog').modal();
+    setBusy();
     $.ajax({
-        url: (uploadUrl + "?DEL=" + path),
+        url: (URL.UPLOAD + "?DEL=" + path),
         type: "GET",
         success: function (result) {
-            $('#pleaseWaitDialog').modal('hide');
+            clearBusy();
             window.location.reload();
         },
         error: function (error) {
-            $('#pleaseWaitDialog').modal('hide');
+            clearBusy();
             console.error(error);
         }
     });
 };
 
 var uploadFileList = function (fileList) {
-    $('#pleaseWaitDialog').modal();
+    setBusy();
     var formData = new FormData();
     for (var i = 0; i < fileList.length; i++) {
         var fl = fileList.item(i);
+        var nName = fl.name.replace(/[^.a-zA-Z _-]/g, "");
         formData.append(fl.name, fl, fl.name);
     }
     console.dir(formData);
@@ -36,15 +53,15 @@ var uploadFileList = function (fileList) {
         processData: false,
         contentType: false,
         success: function (result) {
-            $('#pleaseWaitDialog').modal('hide');
+            clearBusy();
             window.location.reload();
             console.log("File uploaded");
         },
         error: function (error) {
-            $('#pleaseWaitDialog').modal('hide');
+            clearBusy();
             console.error(error);
         }
-    })
+    });
 };
 
 
@@ -118,13 +135,13 @@ function showFileList(path) {
         var fileobj = $("<div></div>");
         //Make a button for deletion
         var delBtn = $('<button type="button" class="close text-danger" aria-label="Delete"><span aria-hidden="true">&times;</span></button>').attr('onclick', "deleteFile('" + urnFl + "')");
-		fileobj.append(delBtn);
+        fileobj.append(delBtn);
         // Append a file entry or directory to the end of the list.
         $("#list").append(
             fileobj.append(
                 filelink.append(
                     caption
-                )             
+                )
             )
         );
     });
@@ -149,6 +166,37 @@ function triggerUpload() {
     $('#file-upload').click();
 }
 
+function fancyFileSize(bytes) {
+    if(bytes < 1e3)
+        return bytes + "&nbsp;B";
+    if(bytes < 1e6)
+        return Math.round(bytes/1e3) + "&nbsp;kB";
+    if(bytes < 1e8)
+        return Math.round(bytes/1e4)/100 + "&nbsp;MB";
+    if(bytes < 1e9)
+        return Math.round(bytes/1e6) + "&nbsp;MB";
+    if(bytes < 1e11)
+        return Math.round(bytes/1e7)/100 + "&nbsp;GB";
+    return Math.round(bytes/1e9) + "&nbsp;GB";
+}
+
+function showFreeSpace(numItems) {
+    var url = "/command.cgi?op=140";
+    // Issue CGI command.
+    $.get(url, function (data) {
+        // Split sizes,sectorSize.
+        var items = data.split(/,/g);
+        // Ignore the first line (title) and last line (blank).
+        var sectorSize = items.pop();
+        items = items[0].split(/\//g);
+        var freeSpace = items[0] * sectorSize;
+        var totalSpace = items[1] * sectorSize;
+        var percent = Math.round(freeSpace/totalSpace);
+        $("#freeSpace").html(fancyFileSize(freeSpace) + " free of " + fancyFileSize(totalSpace));
+        $('#spaceFull').attr('aria-valuenow', percent).css('width', percent);
+    });
+}
+
 // Document Ready
 $(function () {
     if (isV1(wlansd)) {
@@ -156,4 +204,5 @@ $(function () {
     }
     wlansd.sort(cmptime);
     showFileList(location.pathname);
+    showFreeSpace(wlansd.length);
 });
