@@ -47,7 +47,7 @@ var uploadFileList = function (fileList) {
     }
     console.dir(formData);
     $.ajax({
-        url: uploadUrl,
+        url: URL.UPLOAD,
         type: "POST",
         data: formData,
         processData: false,
