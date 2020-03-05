@@ -20,20 +20,42 @@ function clearBusy() {
 }
 
 
+function callAjax(URL, method, data, successCallback, failCallback) {
+    setBusy();
+    try {
+        $.ajax({
+            url: URL,
+            type: method,
+            data: data,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (!!successCallback) {
+                    successCallback(result);
+                }
+                clearBusy();
+                window.location.reload();
+            },
+            error: function (err) {
+                if(!!failCallback){
+                    failCallback(err);
+                }
+                console.error(err);
+                clearBusy();
+                window.location.reload();
+            }
+        });
+    } catch (e) {
+        console.error(e);
+        clearBusy();
+        alert("Error has been encountered. Check console log.");
+    }
+}
+
 //Upload interface
 var fileDelete = function (path) {
-    setBusy();
-    $.ajax({
-        url: (URL.UPLOAD + "?DEL=" + path),
-        type: "GET",
-        success: function (result) {
-            clearBusy();
-            window.location.reload();
-        },
-        error: function (error) {
-            clearBusy();
-            console.error(error);
-        }
+    callAjax((URL.UPLOAD + "?DEL=" + path), "GET",{}, function (result) {
+        console.log("File deleted");
     });
 };
 
@@ -42,25 +64,12 @@ var uploadFileList = function (fileList) {
     var formData = new FormData();
     for (var i = 0; i < fileList.length; i++) {
         var fl = fileList.item(i);
-        var nName = fl.name.replace(/[^.a-zA-Z _-]/g, "");
-        formData.append(fl.name, fl, fl.name);
+        var nName = fl.name.replace(/[^.a-zA-Z0-9 _-]/g, "");
+        formData.append(nName, fl, nName);
     }
     console.dir(formData);
-    $.ajax({
-        url: URL.UPLOAD,
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function (result) {
-            clearBusy();
-            window.location.reload();
-            console.log("File uploaded");
-        },
-        error: function (error) {
-            clearBusy();
-            console.error(error);
-        }
+    callAjax(URL.UPLOAD, "POST", formData, function (result) {
+        console.log("File uploaded");
     });
 };
 
@@ -167,17 +176,17 @@ function triggerUpload() {
 }
 
 function fancyFileSize(bytes) {
-    if(bytes < 1e3)
+    if (bytes < 1e3)
         return bytes + "&nbsp;B";
-    if(bytes < 1e6)
-        return Math.round(bytes/1e3) + "&nbsp;kB";
-    if(bytes < 1e8)
-        return Math.round(bytes/1e4)/100 + "&nbsp;MB";
-    if(bytes < 1e9)
-        return Math.round(bytes/1e6) + "&nbsp;MB";
-    if(bytes < 1e11)
-        return Math.round(bytes/1e7)/100 + "&nbsp;GB";
-    return Math.round(bytes/1e9) + "&nbsp;GB";
+    if (bytes < 1e6)
+        return Math.round(bytes / 1e3) + "&nbsp;kB";
+    if (bytes < 1e8)
+        return Math.round(bytes / 1e4) / 100 + "&nbsp;MB";
+    if (bytes < 1e9)
+        return Math.round(bytes / 1e6) + "&nbsp;MB";
+    if (bytes < 1e11)
+        return Math.round(bytes / 1e7) / 100 + "&nbsp;GB";
+    return Math.round(bytes / 1e9) + "&nbsp;GB";
 }
 
 function showFreeSpace(numItems) {
@@ -191,7 +200,7 @@ function showFreeSpace(numItems) {
         items = items[0].split(/\//g);
         var freeSpace = items[0] * sectorSize;
         var totalSpace = items[1] * sectorSize;
-        var percent = Math.round(freeSpace/totalSpace);
+        var percent = Math.round(freeSpace / totalSpace);
         $("#freeSpace").html(fancyFileSize(freeSpace) + " free of " + fancyFileSize(totalSpace));
         $('#spaceFull').attr('aria-valuenow', percent).css('width', percent);
     });
